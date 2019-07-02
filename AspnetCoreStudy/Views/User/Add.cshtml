@@ -4,33 +4,31 @@
 }
 @*@model AspnetCoreStudy.Models.Member*@
 
-<h2>Add</h2>
+<h2>신규 사용자</h2>
 
 
-<form class="form-horizontal" method="post" asp-controller="User" asp-action="Add">
+<form class="form-horizontal" method="post" asp-controller="User" asp-action="AddUserInfo">
     <div class="form_group">
         <label>이름</label>
         <input type="text" class="form-control" name="name" placeholder="이름" />
     </div>
     <div class="form_group">
         <label>나이</label>
-        <input type="text" class="form-control" name="age" placeholder="나이" />
+        <input type="text" class="form-control number_text" name="age" placeholder="나이" />
     </div>
-    <div class="form_group">
-        <label>배송지명</label>
-        <input type="text" class="form-control" name="shipping_name" placeholder="배송지명" />
-    </div>
-    <div class="form_group">
-        <label>주소</label>
-        <input type="text" class="form-control" name="address" placeholder="주소" />
-    </div>
-    <div class="form_group">
-        <label>우편번호</label>
-        <input type="text" class="form-control" name="zipcode" placeholder="우편번호" />
-    </div>
-
     <div class="form-group">
         <button type="submit" class="btn btn-primary">추가</button>
-        <a class="btn btn-warning" href="#">취소</a>
+        <a class="btn btn-warning" href="javascript:window.history.back();">취소</a>
     </div>
 </form>
+
+<script src="/lib/jquery/dist/jquery.js"></script>
+<script>
+    $(document).ready(function () {
+        // 숫자만
+        $(".number_text").on("keyup", function () {
+            $(this).val($(this).val().replace(/[^0-9]/g, ""));
+        });
+    });
+
+</script>

@@ -1,50 +1,53 @@
 ﻿
-<h2>test</h2>
+<h2>사용자 목록</h2>
 <body>
     <table>
         <caption></caption>
         <thead>
             <tr>
+                <th></th>
                 <th>이름</th>
                 <th>나이</th>
                 <th>배송지명</th>
                 <th>주소</th>
                 <th>우편번호</th>
                 <th></th>
-                <th></th>
             </tr>
         </thead>
         <tbody>
             @foreach (var member in ViewData["shipping_info"] as IEnumerable<Member>)
             {
-            <tr>
-                <td><span>@member.Name</span></td>
-                <td><span>@member.Age</span></td>
-                @*@if (member.AddressList != null)
-        {
-            <td>@(member.AddressList != null ? member.AddressList[0].Name : "")</td>
-            <td>@(member.AddressList != null ? member.AddressList[0].Address : "")</td>
-            <td>@(member.AddressList != null ? member.AddressList[0].Zip : "")</td>
-        }
-        else
-        {
-            <td></td>
-            <td></td>
-            <td></td>
-        }*@
-                <td><span>@(member.AddressList != null ? member.AddressList[0].Name : "")</span></td>
-                <td><span>@(member.AddressList != null ? member.AddressList[0].Address : "")</span></td>
-                <td><span>@(member.AddressList != null ? member.AddressList[0].Zip : "")</span></td>
-                <td><button type="button" data-ix="@member.Ix">수정</button></td>
-                @*<td><button type="button" data-ix="@member.Ix">삭제</button></td>*@
-                @*<td><input type="button" class="btn_delete" value="삭제" data-ix="@member.Ix" onclick="window.location='@Url.Action("Delete", "User", new { ix = @member.Ix })'" /></td>*@
-                <td><input type="button" class="btn_delete" value="삭제" data-ix="@member.Ix"/></td>
-            </tr>
+                <tr>
+                    <td><input type="checkbox" name="chk_delete[]" value="@member.Ix" /></td>
+                    <td><span>@member.Name</span></td>
+                    <td><span>@member.Age</span></td>
+                    @*@if (member.AddressList != null)
+                        {
+                            <td>@(member.AddressList != null ? member.AddressList[0].Name : "")</td>
+                            <td>@(member.AddressList != null ? member.AddressList[0].Address : "")</td>
+                            <td>@(member.AddressList != null ? member.AddressList[0].Zip : "")</td>
+                        }
+                        else
+                        {
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        }*@
+                    <td><span>@((member.AddressList != null && member.AddressList.Count > 0) ? member.AddressList[0].Name : "")</span></td>
+                    <td><span>@((member.AddressList != null && member.AddressList.Count > 0) ? member.AddressList[0].Address : "")</span></td>
+                    <td><span>@((member.AddressList != null && member.AddressList.Count > 0) ? member.AddressList[0].Zip : "")</span></td>
+                    <td><input type="button" class="btn_detail" value="상세" data-ix="@member.Ix" onclick="window.location='@Url.Action("Detail", "User", new { ix = @member.Ix })'" /></td>
+                    <td><button type="button" data-ix="@member.Ix" onclick="window.location='@Url.Action("Edit", "User", new { ix = @member.Ix })'">수정</button></td>
+                    @*<td><button type="button" data-ix="@member.Ix">삭제</button></td>*@
+                    @*<td><input type="button" class="btn_delete" value="삭제" data-ix="@member.Ix" onclick="window.location='@Url.Action("Delete", "User", new { ix = @member.Ix })'" /></td>*@
+                    @*<td><input type="button" class="btn_delete" value="삭제" data-ix="@member.Ix" /></td>*@
+                </tr>
             }
         </tbody>
 
     </table>
     <input type="button" value="추가" onclick="window.location='@Url.Action("Add", "User")'" />
+    <input type="button" class="btn_delete" value="삭제" />
 </body>
 
 <script src="/lib/jquery/dist/jquery.js"></script>
@@ -52,38 +55,28 @@
 <script>
     $(document).ready(function () {
         $(".btn_delete").on("click", function (e) {
-            console.log($(this).attr("data-ix"));
-            //$.ajax({
-            //    type: "POST",
-            //    url: "/user/Delete",
-            //    //data: "{ix: '" + $(this).attr("data-ix") + "'}",
-            //    //data: { ix: $(this).attr("data-ix") },
-            //    data: JSON.stringify({ ix: $(this).attr("data-ix") }),
-            //    //data: "'  aa'=" + "test",
-            //    contentType: "application/json; charset=utf-8",
-            //    //dataType: "json",
-            //    success: function (r) {
-            //        if (r == true) {
-            //            window.location.reload();
-            //        }
-            //    },
-            //    failure: function (r) {
+            var ix_array = new Array();
+            $("[name='chk_delete[]']:checked").each(function () {
+                ix_array.push($(this).val());
+            });
 
-            //    },
-            //    error: function (r) {
+            if (ix_array.length > 0) {
+                var result = confirm("삭제 하시겠습니까?");
+                if (result) {
+                    axios.post('/user/DeleteUserInfo', {
+                        //ix: $(this).attr("data-ix")
+                        ix: ix_array
+                    })
+                    .then(function (response) {
+                        window.location.reload();
+                    })
+                    .catch(function (error) {
 
-            //    }
-
-            //});
-            axios.post('/user/Delete', 
-                { ix: $(this).attr("data-ix") }
-            )
-                .then(function (response) {
-                })
-                .catch(function (error) {
-
-                });
-
+                    });
+                }
+            } else {
+                alert("삭제할 유저를 선택해주세요.");
+            }
         });
     });
 </script>

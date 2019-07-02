@@ -1,0 +1,74 @@
+﻿
+<h1>사용자 정보</h1>
+<body>
+    @{
+        var userInfo = ViewData["userInfo"] as Member;
+    }
+    <ul>
+        <li>user number : @userInfo.Name</li>
+        <li>user age : @userInfo.Age</li>
+    </ul>
+
+    <table>
+        <caption></caption>
+        <thead>
+            <tr>
+                <th></th>
+                <th>배송지명</th>
+                <th>주소</th>
+                <th>우편번호</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (AddressList address in userInfo.AddressList as IEnumerable<AddressList>)
+            {
+                <tr>
+                    <td><input type="checkbox" name="chk_delete[]" value="@address.Name" /></td>
+                    <td><span>@address.Name</span></td>
+                    <td><span>@address.Address</span></td>
+                    <td><span>@address.Zip</span></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <input type="button" value="추가" onclick="window.location='@Url.Action("AddAddress", "User", new { ix = userInfo.Ix })'" />
+    @if (userInfo.AddressList.Count > 0)
+    {
+        <input type="button" class="btn_delete" value="삭제" />
+    }
+    <input type="hidden" class="ix" value="@userInfo.Ix" />
+</body>
+
+<script src="/lib/jquery/dist/jquery.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $(".btn_delete").on("click", function (e) {
+            var name_array = new Array();
+            var ix = $(".ix").val();
+            //삭제할 정보 담기
+            $("[name='chk_delete[]']:checked").each(function () {
+                name_array.push($(this).val());
+            });
+
+            if (name_array.length > 0) {
+                var result = confirm("삭제 하시겠습니까?");
+                if (result) {
+                    axios.post('/user/DeleteAddressInfo', {
+                        ix: ix,
+                        name: name_array
+                    })
+                        .then(function (response) {
+                            window.location.reload();
+                        })
+                        .catch(function (error) {
+
+                        });
+                }
+            } else {
+                alert("삭제할 배송지를 선택해주세요.");
+            }
+        });
+    });
+</script>

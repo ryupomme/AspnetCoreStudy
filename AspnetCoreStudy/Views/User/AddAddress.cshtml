@@ -1,0 +1,40 @@
+﻿
+@{
+    ViewData["Title"] = "배송지추가";
+}
+    <h1>배송지추가</h1>
+@{
+    var userInfo = ViewData["userInfo"] as Member;
+}
+
+
+<form class="form-horizontal" method="post" asp-controller="User" asp-action="AddAddressInfo">
+    <input type="hidden" name="user_ix" value="@userInfo.Ix" />
+    <div class="form_group">
+        <label>배송지명</label>
+        <input type="text" class="form-control" name="shipping_name" placeholder="배송지명" />
+    </div>
+    <div class="form_group">
+        <label>주소</label>
+        <input type="text" class="form-control" name="address" placeholder="주소" />
+    </div>
+    <div class="form_group">
+        <label>우편번호</label>
+        <input type="text" class="form-control number_text" name="zipcode" placeholder="우편번호" />
+    </div>
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">추가</button>
+        <a class="btn btn-warning" href="javascript:window.history.back();">취소</a>
+    </div>
+</form>
+
+<script src="/lib/jquery/dist/jquery.js"></script>
+<script>
+    $(document).ready(function () {
+        // 숫자만
+        $(".number_text").on("keyup", function () {
+            $(this).val($(this).val().replace(/[^0-9]/g, ""));
+        });
+    });
+
+</script>

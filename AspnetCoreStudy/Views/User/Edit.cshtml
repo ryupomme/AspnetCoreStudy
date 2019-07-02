@@ -1,0 +1,36 @@
+﻿
+@{
+    ViewData["Title"] = "Edit";
+}
+<h1>사용자 정보 수정</h1>
+@{
+    var userInfo = ViewData["userInfo"] as Member;
+}
+
+<form class="form-horizontal" method="post" asp-controller="User" asp-action="EditUserInfo">
+    <input type="hidden" name="user_ix" value="@userInfo.Ix" />
+    <div class="form_group">
+        <label>이름</label>
+        <input type="text" class="form-control" name="name" value="@userInfo.Name" placeholder="이름" />
+    </div>
+    <div class="form_group">
+        <label>나이</label>
+        <input type="text" class="form-control number_text" name="age" value="@userInfo.Age" placeholder="나이" />
+    </div>
+
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">수정</button>
+        <a class="btn btn-warning" href="javascript:window.history.back();">취소</a>
+    </div>
+</form>
+
+<script src="/lib/jquery/dist/jquery.js"></script>
+<script>
+    $(document).ready(function () {
+        // 숫자만
+        $(".number_text").on("keyup", function () {
+            $(this).val($(this).val().replace(/[^0-9]/g, ""));
+        });
+    });
+
+</script>
