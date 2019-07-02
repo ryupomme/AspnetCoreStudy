@@ -1,0 +1,89 @@
+﻿
+<h2>test</h2>
+<body>
+    <table>
+        <caption></caption>
+        <thead>
+            <tr>
+                <th>이름</th>
+                <th>나이</th>
+                <th>배송지명</th>
+                <th>주소</th>
+                <th>우편번호</th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var member in ViewData["shipping_info"] as IEnumerable<Member>)
+            {
+            <tr>
+                <td><span>@member.Name</span></td>
+                <td><span>@member.Age</span></td>
+                @*@if (member.AddressList != null)
+        {
+            <td>@(member.AddressList != null ? member.AddressList[0].Name : "")</td>
+            <td>@(member.AddressList != null ? member.AddressList[0].Address : "")</td>
+            <td>@(member.AddressList != null ? member.AddressList[0].Zip : "")</td>
+        }
+        else
+        {
+            <td></td>
+            <td></td>
+            <td></td>
+        }*@
+                <td><span>@(member.AddressList != null ? member.AddressList[0].Name : "")</span></td>
+                <td><span>@(member.AddressList != null ? member.AddressList[0].Address : "")</span></td>
+                <td><span>@(member.AddressList != null ? member.AddressList[0].Zip : "")</span></td>
+                <td><button type="button" data-ix="@member.Ix">수정</button></td>
+                @*<td><button type="button" data-ix="@member.Ix">삭제</button></td>*@
+                @*<td><input type="button" class="btn_delete" value="삭제" data-ix="@member.Ix" onclick="window.location='@Url.Action("Delete", "User", new { ix = @member.Ix })'" /></td>*@
+                <td><input type="button" class="btn_delete" value="삭제" data-ix="@member.Ix"/></td>
+            </tr>
+            }
+        </tbody>
+
+    </table>
+    <input type="button" value="추가" onclick="window.location='@Url.Action("Add", "User")'" />
+</body>
+
+<script src="/lib/jquery/dist/jquery.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $(".btn_delete").on("click", function (e) {
+            console.log($(this).attr("data-ix"));
+            //$.ajax({
+            //    type: "POST",
+            //    url: "/user/Delete",
+            //    //data: "{ix: '" + $(this).attr("data-ix") + "'}",
+            //    //data: { ix: $(this).attr("data-ix") },
+            //    data: JSON.stringify({ ix: $(this).attr("data-ix") }),
+            //    //data: "'  aa'=" + "test",
+            //    contentType: "application/json; charset=utf-8",
+            //    //dataType: "json",
+            //    success: function (r) {
+            //        if (r == true) {
+            //            window.location.reload();
+            //        }
+            //    },
+            //    failure: function (r) {
+
+            //    },
+            //    error: function (r) {
+
+            //    }
+
+            //});
+            axios.post('/user/Delete', 
+                { ix: $(this).attr("data-ix") }
+            )
+                .then(function (response) {
+                })
+                .catch(function (error) {
+
+                });
+
+        });
+    });
+</script>
