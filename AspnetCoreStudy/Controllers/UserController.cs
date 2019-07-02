@@ -15,11 +15,6 @@ namespace AspnetCoreStudy.Controllers
 {
     public class UserController : Controller
     {
-        //// GET: /<controller>/
-        //public IActionResult Index()
-        //{
-        //    return View();
-        //}
 
         private readonly IHostingEnvironment _hostingEnvironment;
         private string contentRootPath;
@@ -34,7 +29,7 @@ namespace AspnetCoreStudy.Controllers
 
         public ActionResult List()
         {
-            List<Member> members = this.GetDataList();
+            List<Member> members = this.GetUserList();
 
             ViewData["shipping_info"] = members;
 
@@ -48,7 +43,6 @@ namespace AspnetCoreStudy.Controllers
 
         public IActionResult AddUserInfo(Member model)
         {
-            //validation check
             Member member = new Member();
 
             member.Age = Int32.Parse(Request.Form["age"].ToString());
@@ -65,7 +59,7 @@ namespace AspnetCoreStudy.Controllers
         public ActionResult Edit()
         {
             int ix = Int32.Parse(Request.Query["ix"]);
-            Member member = this.GetData(ix);
+            Member member = this.GetUser(ix);
             ViewData["userInfo"] = member;
 
             return View();
@@ -75,7 +69,7 @@ namespace AspnetCoreStudy.Controllers
         {
             int user_ix = Int32.Parse(Request.Form["user_ix"]);
 
-            List<Member> members = this.GetDataList();
+            List<Member> members = this.GetUserList();
 
             Member selectedMember = (from member in members
                                      where member.Ix == user_ix
@@ -87,7 +81,7 @@ namespace AspnetCoreStudy.Controllers
                 selectedMember.Age = Int32.Parse(Request.Form["age"]);
             }
 
-            WriteJsonFile(members);
+            this.WriteJsonFile(members);
 
             return RedirectToAction("List", "User");
         }
@@ -96,7 +90,7 @@ namespace AspnetCoreStudy.Controllers
         {
             int detailMemberIx = Int32.Parse(Request.Query["ix"]);
 
-            List<Member> members = this.GetDataList();
+            List<Member> members = this.GetUserList();
 
             Member detailMember = (from member in members
                                    where member.Ix == detailMemberIx
@@ -107,12 +101,11 @@ namespace AspnetCoreStudy.Controllers
             return View();
         }
 
-        //public IActionResult Delete()
         public bool DeleteUserInfo([FromBody] JObject jsonData)
         {
             //return "";
             bool is_sucess = false;
-            List<Member> members = this.GetDataList();
+            List<Member> members = this.GetUserList();
             //int delete_item_ix = Int32.Parse(Request.Query["ix"]);
             //int delete_item_ix = Int32.Parse(jsonData["ix"].ToString());
             int[] deleteIxArray = Array.ConvertAll(jsonData["ix"].ToArray(), s => Int32.Parse(s.ToString()));
@@ -144,7 +137,7 @@ namespace AspnetCoreStudy.Controllers
         public ActionResult AddAddress()
         {
             int ix = Int32.Parse(Request.Query["ix"]);
-            Member member = this.GetData(ix);
+            Member member = this.GetUser(ix);
             ViewData["userInfo"] = member;
             return View();
         }
@@ -153,18 +146,23 @@ namespace AspnetCoreStudy.Controllers
         {
             int userIx = Int32.Parse(Request.Form["user_ix"]);
             AddressList address_info = new AddressList();
+            List<Member> members = this.GetUserList();
+
+            // dataset
             address_info.Name = Request.Form["shipping_name"].ToString();
             address_info.Address = Request.Form["address"].ToString();
             address_info.Zip = Request.Form["zipcode"].ToString();
 
-            List<Member> members = this.GetDataList();
-
             Member selectedMember = (from member in members
                                      where member.Ix == Int32.Parse(Request.Form["user_ix"])
                                      select member).FirstOrDefault();
-            selectedMember.AddressList.Add(address_info);
 
-            WriteJsonFile(members);
+            if (selectedMember != null)
+            {
+                selectedMember.AddressList.Add(address_info);
+            }
+
+            this.WriteJsonFile(members);
 
             return RedirectToAction("Detail", "User", new { ix = userIx });
         }
@@ -172,7 +170,7 @@ namespace AspnetCoreStudy.Controllers
         public bool DeleteAddressInfo([FromBody] JObject jsonData)
         {
             bool is_sucess = false;
-            List<Member> members = this.GetDataList();
+            List<Member> members = this.GetUserList();
             int userIx = Int32.Parse(jsonData["ix"].ToString());
             string[] deleteNameArray = Array.ConvertAll(jsonData["name"].ToArray(), s => s.ToString());
 
@@ -204,7 +202,7 @@ namespace AspnetCoreStudy.Controllers
 
         private List<Member> AddData(Member newUser)
         {
-            List<Member> members = this.GetDataList();
+            List<Member> members = this.GetUserList();
 
             int lastIx = (from member in members
                            orderby member.Ix descending
@@ -220,7 +218,7 @@ namespace AspnetCoreStudy.Controllers
         /// Get Data from Json File
         /// </summary>
         /// <returns></returns>
-        private List<Member> GetDataList()
+        private List<Member> GetUserList()
         {
             StreamReader r = new StreamReader(this.contentRootPath);
             string json = r.ReadToEnd();
@@ -235,7 +233,7 @@ namespace AspnetCoreStudy.Controllers
         /// Get Data from Json File
         /// </summary>
         /// <returns></returns>
-        private Member GetData(int ix)
+        private Member GetUser(int ix)
         {
             StreamReader r = new StreamReader(this.contentRootPath);
             string json = r.ReadToEnd();
